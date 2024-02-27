@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>SlabManBuff</AssemblyName>
-    <Description>A buff for the Alt Marksman Revolver</Description>
+    <Description>A rework for the Alt Marksman Revolver</Description>
     <Version>1.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
