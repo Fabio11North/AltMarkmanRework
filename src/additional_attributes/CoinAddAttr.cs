@@ -5,49 +5,40 @@ namespace SlabManBuff{
         public int hitAmmount = Property.CoinTotalHitAmmount;
         public float bounceForce = Property.CoinHitBounceForce;
         public bool noDeadCoin = false;
-        public GameObject coinPrefab = null;
-        public void CreateAndSetCoinPrefab(Coin sourceCoin, bool noDeadCoin, int hitAmmount){
-            //Create Clone
-            coinPrefab = Object.Instantiate<GameObject>(sourceCoin.gameObject, 
-                    sourceCoin.transform.position, Quaternion.identity);
+        public GameObject coinClone = null;
 
-            //Set Initial parameters
-            Coin coinPrefabScript = coinPrefab.GetComponent<Coin>();
-            if(coinPrefabScript) {
-                if(coinPrefabScript.ricochets > 0){
-                    coinPrefabScript.ricochets = 0;
-                    coinPrefabScript.power += 1;
-                }
-            }
-
-            CoinAddAttr coinPrefabAttr = coinPrefab.GetComponent<CoinAddAttr>();
-            if(coinPrefabAttr){
-                coinPrefabAttr.noDeadCoin = noDeadCoin;
-                coinPrefabAttr.hitAmmount = hitAmmount;
-            }
-
-            coinPrefab.SetActive(false);
-        }
-
-        public void DelayedCloneAndBounce(){
-            Invoke("CloneAndBounce", 0f);
-        }
-
-        public void CloneAndBounce(){
-            BounceCoin(coinPrefab.GetComponent<Coin>());
-        }
-
-        private void BounceCoin(Coin prefabCoinScript){
-            //Create coin clone
-            GameObject coinClone = Object.Instantiate(prefabCoinScript.gameObject, prefabCoinScript.transform.position, 
+        public void CreateClone(Coin sourceCoin){
+            coinClone = Object.Instantiate(sourceCoin.gameObject, sourceCoin.transform.position, 
                 Quaternion.identity);
-            coinClone.SetActive(true);
-            //Set coin clone attributes
-            coinClone.name = "NewCoin+" + (prefabCoinScript.power - 2f);
+            coinClone.name = "NewCoin+" + (sourceCoin.power - 2f);
+            coinClone.SetActive(false);
 
+            //Set coin fields
             Coin coinCloneScript = coinClone.GetComponent<Coin>();
-            if(coinCloneScript.shot) coinCloneScript.shot = false;
+            if(coinCloneScript){
+                coinCloneScript.shot = false;
+                coinCloneScript.ricochets = 0;
+                coinCloneScript.power += 1;
+            }
 
+            CoinAddAttr coinCloneAttr = coinClone.GetComponent<CoinAddAttr>();
+            if(coinCloneAttr){
+                coinCloneAttr.noDeadCoin = true;
+                coinCloneAttr.hitAmmount -= 1;
+            }
+        }
+
+        public void DelayedBounce(){
+            Invoke("Bounce", 0.0f);
+        }
+
+        private void Bounce(){
+            if(!coinClone) return;
+            
+            //Activate coin clone
+            coinClone.SetActive(true);
+
+            //Bounce coin
             Rigidbody coinCloneRigidbody = coinClone.GetComponent<Rigidbody>();
             if(coinCloneRigidbody){
                 coinCloneRigidbody.isKinematic = false;
@@ -55,12 +46,8 @@ namespace SlabManBuff{
                 coinCloneRigidbody.AddForce(Vector3.up * bounceForce, ForceMode.VelocityChange);
             }
 
-            //Remove coin
-            prefabCoinScript.shot = true;
-            prefabCoinScript.GetComponent<SphereCollider>().enabled = false;
-            prefabCoinScript.gameObject.SetActive(false);
-            new GameObject().AddComponent<CoinCollector>().coin = prefabCoinScript.gameObject;
-            prefabCoinScript.CancelInvoke("GetDeleted");
+            //Set coinclone to false
+            coinClone = null;
         }
     }
 }
