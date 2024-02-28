@@ -20,7 +20,7 @@ namespace SlabManBuff{
         "Determines the force with which the coin bounces after shooting it.")]
         private static float coinHitBounceForce = 25f;
 
-        [Configgable("", "The coin size scale", 0, 
+        [Configgable("", "Coin size scale", 0, 
         "Determines the size of the coin, relative to the original size.")]
         private static float coinScale = 1.25f;
 
