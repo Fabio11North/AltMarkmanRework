@@ -14,14 +14,28 @@ namespace SlabManBuff{
             GameObject panel = canvas.transform.GetChild(0).gameObject;
             if(!panel) return;
 
-            //Destroy unnecessary coin panels
-            GameObject[] coinPanelArray = new GameObject[2];
+            //Destroy original coin panels
             for(int i = 0; i < panel.transform.childCount; i++){
                 GameObject coinPanel = panel.transform.GetChild(i).gameObject;
-                if(i%2 != 0) Object.Destroy(coinPanel);
-                else coinPanelArray[i/2] = coinPanel;
+                Object.Destroy(coinPanel);
             }
             
+            //Create new coinPanels
+            GameObject[] coinPanelArray = new GameObject[2];
+            for(int i = 0; i < coinPanelArray.Length; i++){
+                //Create coin panel
+                GameObject coinPanel = new GameObject("coinPanel");
+                coinPanel.AddComponent<CanvasRenderer>();
+                coinPanel.AddComponent<RectTransform>();
+                coinPanel.AddComponent<Image>();
+                
+                //Set parent 
+                coinPanel.transform.SetParent(panel.transform, false);
+
+                //Add to array
+                coinPanelArray[i] = coinPanel;
+            }
+
             //Initialize image array
             Image[] imageArray = new Image[coinPanelArray.Length];
             Sprite sprite = AssetManager.LoadAsset<Sprite>("assets/textures/coincharges.png");
@@ -50,6 +64,7 @@ namespace SlabManBuff{
                 //Set Images
                 Image image = coinPanel.GetComponent<Image>();
                 image.sprite = sprite;
+                image.type =Image.Type.Filled;
                 image.fillMethod = Image.FillMethod.Horizontal;
                 image.fillOrigin = 1;
                 imageArray[i] = image;
