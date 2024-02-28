@@ -10,8 +10,8 @@ namespace SlabManBuff{
 
             if(___hitTimes > 0 && ___altBeam == null) return;
 
-            //Create coin clone if possible
-            if(attr.coinPrefab) attr.DelayedCloneAndBounce();
+            //Bounce coin
+            if(attr.coinClone) attr.DelayedBounce();
         }
     }
 
@@ -24,8 +24,9 @@ namespace SlabManBuff{
             if(!___checkingSpeed) return;
 
             //Create coin prefab with one less hitAmmount if the hit ammount > 1
-            if(attr.hitAmmount > 1){
-                attr.CreateAndSetCoinPrefab(__instance, true, attr.hitAmmount-1);
+            if(attr.hitAmmount > 1 && !__instance.shot && !attr.coinClone){
+                attr.CreateClone(__instance);
+                attr.hitAmmount = 0;
             }
         }
     }
@@ -41,6 +42,9 @@ namespace SlabManBuff{
                     ___cols[i].enabled = false;
                 }
                 ___checkingSpeed = true;
+                
+                //Reset deadcoin
+                attr.noDeadCoin = false;
             }
 
             //Change coin appearance
