@@ -1,3 +1,5 @@
+using Configgy;
+using HarmonyLib;
 using UnityEngine;
 
 namespace SlabManBuff{
@@ -12,6 +14,12 @@ namespace SlabManBuff{
                 Quaternion.identity);
             coinClone.name = "NewCoin+" + (sourceCoin.power - 2f);
             coinClone.SetActive(false);
+
+            //Remove every child game object that isn't audioSource
+            foreach(Transform childTr in coinClone.transform.GetChildren()){
+                GameObject child = childTr.gameObject;
+                if(child.transform.GetSiblingIndex() != 0) Object.Destroy(child);
+            }
 
             //Set coin fields
             Coin coinCloneScript = coinClone.GetComponent<Coin>();

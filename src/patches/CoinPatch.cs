@@ -1,3 +1,4 @@
+using Configgy;
 using HarmonyLib;
 using UnityEngine;
 
@@ -17,14 +18,16 @@ namespace SlabManBuff{
 
     [HarmonyPatch(typeof(Coin), "DelayedReflectRevolver")]
     class Coin_DelayedReflectRevolverPatch{
-        public static void Prefix(Coin __instance, bool ___checkingSpeed){
+        public static void Prefix(Coin __instance, bool ___checkingSpeed, GameObject ___currentCharge){
             CoinAddAttr attr = __instance.gameObject.GetComponent<CoinAddAttr>();
             if(!attr) return;
 
             if(!___checkingSpeed) return;
 
             //Create coin prefab with one less hitAmmount if the hit ammount > 1
-            if(attr.hitAmmount > 1 && !__instance.shot && !attr.coinClone){
+            if(attr.hitAmmount > 1 && !attr.coinClone){
+                if(___currentCharge) 
+                    Object.Destroy(___currentCharge);
                 attr.CreateClone(__instance);
                 attr.hitAmmount = 0;
             }
