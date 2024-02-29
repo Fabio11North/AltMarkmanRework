@@ -1,5 +1,4 @@
 using Configgy;
-using HarmonyLib;
 using UnityEngine;
 
 namespace SlabManBuff{
@@ -10,6 +9,8 @@ namespace SlabManBuff{
         public GameObject coinClone = null;
 
         public void CreateClone(Coin sourceCoin){
+            if(coinClone) return;
+
             coinClone = Object.Instantiate(sourceCoin.gameObject, sourceCoin.transform.position, 
                 Quaternion.identity);
             coinClone.name = "NewCoin+" + (sourceCoin.power - 2f);
@@ -37,6 +38,8 @@ namespace SlabManBuff{
         }
 
         public void DelayedBounce(){
+            if(!coinClone) return;
+
             Invoke("Bounce", 0.0f);
         }
 
