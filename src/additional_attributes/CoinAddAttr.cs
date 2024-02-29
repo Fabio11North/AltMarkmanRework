@@ -1,3 +1,4 @@
+using Configgy;
 using UnityEngine;
 
 namespace SlabManBuff{
@@ -8,10 +9,18 @@ namespace SlabManBuff{
         public GameObject coinClone = null;
 
         public void CreateClone(Coin sourceCoin){
+            if(coinClone) return;
+
             coinClone = Object.Instantiate(sourceCoin.gameObject, sourceCoin.transform.position, 
                 Quaternion.identity);
             coinClone.name = "NewCoin+" + (sourceCoin.power - 2f);
             coinClone.SetActive(false);
+
+            //Remove every child game object that isn't audioSource
+            foreach(Transform childTr in coinClone.transform.GetChildren()){
+                GameObject child = childTr.gameObject;
+                if(child.transform.GetSiblingIndex() != 0) Object.Destroy(child);
+            }
 
             //Set coin fields
             Coin coinCloneScript = coinClone.GetComponent<Coin>();
@@ -29,6 +38,8 @@ namespace SlabManBuff{
         }
 
         public void DelayedBounce(){
+            if(!coinClone) return;
+
             Invoke("Bounce", 0.0f);
         }
 

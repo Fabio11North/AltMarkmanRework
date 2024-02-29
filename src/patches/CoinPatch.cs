@@ -1,3 +1,4 @@
+using Configgy;
 using HarmonyLib;
 using UnityEngine;
 
@@ -24,7 +25,8 @@ namespace SlabManBuff{
             if(!___checkingSpeed) return;
 
             //Create coin prefab with one less hitAmmount if the hit ammount > 1
-            if(attr.hitAmmount > 1 && !__instance.shot && !attr.coinClone){
+            //And if the clone wasnt created
+            if(attr.hitAmmount > 1 && !attr.coinClone){
                 attr.CreateClone(__instance);
                 attr.hitAmmount = 0;
             }
@@ -69,6 +71,47 @@ namespace SlabManBuff{
             if(___currentCharge){
                 SpriteRenderer renderer = ___currentCharge.GetComponentInChildren<SpriteRenderer>();
                 renderer.sprite = AssetManager.LoadAsset<Sprite>("assets/textures/muzzleflash.png");
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(Coin), "DelayedEnemyReflect")]
+    class Coin_DelayedEnemyReflectPatch{
+        public static void Prefix(Coin __instance){
+            CoinAddAttr attr = __instance.gameObject.GetComponent<CoinAddAttr>();
+            if(!attr) return;
+
+            if(__instance.shot) return;
+
+            //Create coin prefab with one less hitAmmount if the hit ammount > 1
+            //And if the clone wasnt created
+            if(attr.hitAmmount > 1 && !attr.coinClone){
+                attr.CreateClone(__instance);
+                attr.hitAmmount = 0;
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(Coin), "EnemyReflect")]
+    class Coin_EnemyReflectPatch{
+        public static void Postfix(Coin __instance){
+            CoinAddAttr attr = __instance.gameObject.GetComponent<CoinAddAttr>();
+            if(!attr) return;
+
+            if(!__instance.shotByEnemy){
+                if(attr.coinClone) attr.DelayedBounce();
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(Coin), "ShootAtPlayer")]
+    class Coin_ShootAtPlayerPatch{
+        public static void Postfix(Coin __instance){
+            CoinAddAttr attr = __instance.gameObject.GetComponent<CoinAddAttr>();
+            if(!attr) return;
+
+            if(!__instance.shotByEnemy){
+                if(attr.coinClone) attr.DelayedBounce();
             }
         }
     }
